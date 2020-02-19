@@ -264,7 +264,7 @@ require([
 		
 		minEmpty(min);minEmpty(oldMin);minEmpty(newMin);minEmpty(srcMin);	
 		if ( caseNum == null || caseNum === "" ){
-                	alert("Case number empty. Please fill up field with unique case number.");
+                	alert("Case number empty. Please fill up field with unique case number. Use alphanumeric and hyphen only (CASE-00001)");
                 	return;
                 }else {
 			var ok = confirm("Do you wish to confirm?");
