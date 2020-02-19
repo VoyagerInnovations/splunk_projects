@@ -1,0 +1,160 @@
+#!/usr/bin/expect 
+
+set timeout 30
+set uname [lindex $argv 0]
+set count [lindex $argv 1]
+set ticket [lindex $argv 2]
+set min [lindex $argv 3]
+set lname [lindex $argv 4] 
+set fname [lindex $argv 5] 
+set oldMin [lindex $argv 6] 
+set newMin [lindex $argv 7] 
+set kycId [lindex $argv 8]
+set file [lindex $argv 9] 
+set srcMin [lindex $argv 10] 
+set RRN [lindex $argv 11]
+set updateFName [lindex $argv 12]
+set updateMName [lindex $argv 13]
+set updateLName [lindex $argv 14]
+set updateAddressName [lindex $argv 15]
+set updateAddressValue [lindex $argv 16]
+set updateAddressType [lindex $argv 17]
+set updateBirthday [lindex $argv 18]
+set updateEAddress [lindex $argv 19]
+set updateProfile [lindex $argv 20]
+set logger [lindex $argv 21]
+
+log_file $logger
+
+spawn /usr/bin/ssh -q  splunk_user@172.18.106.177
+
+expect "$"
+send "sudo /root/ops-menu/update_account_profile.sh\r"
+expect "Enter Username:"
+send "$uname\r"
+expect "Enter JIRA Ticket:"
+send "$ticket\r"
+if { $count == 1 } { 
+expect "Please choose an action:"
+send "$count\r"
+expect "Please enter MSISDN: (e.g. +639471234567)"
+send "$min\r" 
+expect "Please enter Account Name: (LastName,FirstName)"
+send "$lname,$fname\r" 
+} elseif { $count == 2 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Please enter MSISDN: (e.g. +639471234567)"
+send "$min\r" 
+expect "Please enter Account Name: (LastName,FirstName)"
+send "$lname,$fname\r" 
+} elseif { $count == 3 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Enter OLD MIN: (e.g. +639471234567)"
+send "$oldMin\r" 
+expect "Enter NEW MIN: (e.g. +639471234567)"
+send "$newMin\r" 
+} elseif { $count == 4 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Please choose an action:"
+send "$updateProfile\r"
+expect "Please enter MSISDN: (e.g. +639471234567)"
+send "$min\r"
+expect "Please enter Account Name: (LastName,FirstName)"
+send "$lname,$fname\r"
+    if { $updateProfile == 1 } {
+	expect "First Name:" 
+	send "$updateFName\r"
+	expect "Middle Name:"
+	send "$updateMName\r"
+	expect "Last Name:"
+	send "$updateLName\r"
+       } elseif { $updateProfile == 2 } {
+	expect "Address Field Name:"
+	send "$updateAddressName\r"
+	expect "Address Field Value:"
+	send "$updateAddressValue\r"
+	expect "Address Type: (PERMANENT,PRESENT,BOTH)"
+	send "$updateAddressType\r"
+       } elseif { $updateProfile == 3 } {
+	expect "Correct Birthday: (MM-DD-YYYY)"
+	send "$updateBirthday\r"
+       } elseif { $updateProfile == 4 } {
+	expect "New Alt Contact:"
+	send "$updateEAddress\r"
+	expect "New Contact Type: (email/msisdn)"
+	send "email\r"
+       }
+} elseif { $count == 5 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Please enter MSISDN: (e.g. +639471234567)"
+send "$min\r"
+expect "Please enter Account Name: (LastName,FirstName)"
+send "$lname,$fname\r"
+expect "Please enter the KYC Reference ID: (e.g. 639471234567-XYZ123)"
+send "$kycId\r"
+} elseif { $count == 6 } {
+expect "Please choose an action:"
+send "$count\r"
+expect  "Please input file path (e.g./home/dpmanoso/RFC-123-mins.txt):"
+send "$file\r"
+} elseif { $count == 7 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Please input the filename of the list of MINs: (ex: /home/ec2-user/mins.txt)"
+send "$file\r"
+} elseif { $count == 8 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Enter path of input file: "
+send "$file\r"
+} elseif { $count == 9 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Enter path of input file: "
+send "$file\r"
+} elseif { $count == 10 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Jira Ticket:"
+send "$ticket\r"
+expect "MSISDN to downgrade (e.g. +639123456789):"
+send "$min\r"
+expect "Enter First Name:"
+send "$fname\r"
+expect "Enter Last Name:"
+send "$lname\r"
+} elseif { $count == 11 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Please provide comma-separated MINs (e.g. +639991234567,+639981234567): "
+send "$file\r"
+} elseif { $count == 12 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Please input file path (e.g./home/dpmanoso/RFC-123-mins.txt):"
+send "$file\r"
+} elseif { $count == 13 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Enter path of input file: "
+send "$file\r"
+} elseif { $count == 14 } {
+expect "Please choose an action:"
+send "$count\r"
+expect "Please enter SOURCE MIN: (e.g. 639471234567)"
+send "$srcMin\r"
+expect "Please enter TXN RRN: (e.g. 060612345678)"
+send "$RRN\r"
+}
+
+expect "Would you like to do another transaction? (y/n):"
+send "n"
+exit;
+
+
+
+
