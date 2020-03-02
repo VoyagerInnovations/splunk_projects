@@ -39,227 +39,227 @@ lq_file="$lq_path/$file"
 logfile="/apps/splunk/etc/apps/csg/bin/scripts/logs/updateprofile.${ticket}.log"
 resultfile="/apps/splunk/etc/apps/csg/lookups/updateprofile_${uname}_result.csv"
 
-echo "TIMESTAMP: $TS" | tee $resultfile
-echo "USERNAME = $uname" | tee $resultfile
-echo "TICKET = $ticket" | tee $resultfile
+echo "TIMESTAMP: $TS" | tee -a $resultfile
+echo "USERNAME = $uname" | tee -a $resultfile
+echo "TICKET = $ticket" | tee -a $resultfile
 
 
 case $action in 
-	block_and_create_new_virtual_account)
-    echo "ACTION = virtual_card_replacement" | tee $resultfile
-	echo "DETAILS = \"MIN: $min\"" | tee $resultfile
+    block_and_create_new_virtual_account)
+    echo "ACTION = virtual_card_replacement" | tee -a $resultfile
+    echo "DETAILS = \"MIN: $min\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "DONE BLOCKING AND CREATING NEW VIRTUAL ACCOUNT.")
-	if [ $x -eq 0 ]; then
+    if [ $x -eq 0 ]; then
     ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-        echo "STATUS = FAILED" | tee $resultfile
-        echo "$ERROR" | tee $resultfile
-	else
-	echo "STATUS = SUCCESSFUL" | tee $resultfile
-	fi
-	;;
-	cancel_account)
-    echo "ACTION = min_deregistration_from_account" | tee $resultfile
-	echo "DETAILS = \"MIN: $min\"" | tee $resultfile
+        echo "STATUS = FAILED" | tee -a $resultfile
+        echo "$ERROR" | tee -a $resultfile
+    else
+    echo "STATUS = SUCCESSFUL" | tee -a $resultfile
+    fi
+    ;;
+    cancel_account)
+    echo "ACTION = min_deregistration_from_account" | tee -a $resultfile
+    echo "DETAILS = \"MIN: $min\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "DONE WITH ACCOUNT CANCELLATION.")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-            echo "STATUS = FAILED" | tee $resultfile
-            echo "$ERROR" | tee $resultfile
+            echo "STATUS = FAILED" | tee -a $resultfile
+            echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
         ;;
-	min_reassignment)
-    echo "ACTION = min_reassignment" | tee $resultfile
-	echo "DETAILS = \"OLD MIN: $oldMin NEW MIN: $newMin\"" | tee $resultfile
-	x=$(cat $logfile | grep -c "Successfully updated MIN in identity management service")
+    min_reassignment)
+    echo "ACTION = min_reassignment" | tee -a $resultfile
+    echo "DETAILS = \"OLD MIN: $oldMin NEW MIN: $newMin\"" | tee -a $resultfile
+    x=$(cat $logfile | grep -c "Successfully updated MIN in identity management service")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-            echo "STATUS = FAILED" | tee $resultfile
-            echo "$ERROR" | tee $resultfile
+            echo "STATUS = FAILED" | tee -a $resultfile
+            echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
-	fi
-	;;
-	update_profile)
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
+    fi
+    ;;
+    update_profile)
         case $updateProfile in 
-	     tab_update_name)
-             echo "ACTION = update_profile" | tee $resultfile
-	         echo "DETAILS = \"MIN: $min FIRST NAME: $updateFName MIDDLE NAME: $updateMName LAST NAME: $updateLName\"" >> $resultfile
+         tab_update_name)
+             echo "ACTION = update_profile" | tee -a $resultfile
+             echo "DETAILS = \"MIN: $min FIRST NAME: $updateFName MIDDLE NAME: $updateMName LAST NAME: $updateLName\"" >> $resultfile
              x=$(cat $logfile | grep -c "Done updating the name of the user in the database.")
              if [ $x -eq 0 ]; then
              ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
              else
-             echo "STATUS = SUCCESSFUL" | tee $resultfile
+             echo "STATUS = SUCCESSFUL" | tee -a $resultfile
              fi
              ;;
-	     tab_update_address)
-             echo "ACTION = update_profile" | tee $resultfile
-	         echo "DETAILS = \"MIN: $min ADDRESS FIELD: $updateAddressName ADDRESS VALUE: $updateAddressValue TYPE: $updateAddressType\"" >> $resultfile
+         tab_update_address)
+             echo "ACTION = update_profile" | tee -a $resultfile
+             echo "DETAILS = \"MIN: $min ADDRESS FIELD: $updateAddressName ADDRESS VALUE: $updateAddressValue TYPE: $updateAddressType\"" >> $resultfile
              x=$(cat $logfile | grep -c "DONE UPDATING ADDRESS.")
              if [ $x -eq 0 ]; then
              ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
              else
-             echo "STATUS = SUCCESSFUL" | tee $resultfile
+             echo "STATUS = SUCCESSFUL" | tee -a $resultfile
              fi 
-	     ;;
-	     tab_update_birthday)
-             echo "ACTION = update_profile" | tee $resultfile
-             echo "DETAILS = \"MIN: $min NEW BIRTHDAY: $updateBirthday\"" | tee $resultfile
+         ;;
+         tab_update_birthday)
+             echo "ACTION = update_profile" | tee -a $resultfile
+             echo "DETAILS = \"MIN: $min NEW BIRTHDAY: $updateBirthday\"" | tee -a $resultfile
              x=$(cat $logfile | grep -c "Done updating birthday.")
              if [ $x -eq 0 ]; then
              ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
              else
-             echo "STATUS = SUCCESSFUL" | tee $resultfile
+             echo "STATUS = SUCCESSFUL" | tee -a $resultfile
              fi
-	     ;;
-	     tab_update_eaddress)
-             echo "ACTION = update_profile" | tee $resultfile
+         ;;
+         tab_update_eaddress)
+             echo "ACTION = update_profile" | tee -a $resultfile
              x=$(cat $logfile | grep -c "Done updating email.")
-	     y=$(grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b" $logfile | head -n1)
-	     echo "DETAILS = \"MIN: $min OLD EMAIL: $y NEW EMAIL: $updateEAddress\"" >> $resultfile
-	     if [ $x -eq 0 ]; then
+         y=$(grep -E -o "\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,6}\b" $logfile | head -n1)
+         echo "DETAILS = \"MIN: $min OLD EMAIL: $y NEW EMAIL: $updateEAddress\"" >> $resultfile
+         if [ $x -eq 0 ]; then
              ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
              else
-             echo "STATUS = SUCCESSFUL" | tee $resultfile
+             echo "STATUS = SUCCESSFUL" | tee -a $resultfile
              fi
-	     ;;	
-	     *)
-     	     ;;
-	esac
-	;;
-	downgrade_kyc1)
-	x=$(cat $logfile | grep -c "transaction_reference_no")
-	y=$(cat $logfile | grep "transaction_reference_no")
-    echo "ACTION = downgrade_kyc1" | tee $resultfile
+         ;; 
+         *)
+             ;;
+    esac
+    ;;
+    downgrade_kyc1)
+    x=$(cat $logfile | grep -c "transaction_reference_no")
+    y=$(cat $logfile | grep "transaction_reference_no")
+    echo "ACTION = downgrade_kyc1" | tee -a $resultfile
         if [ $x -eq 0 ]; then
-	echo "DETAILS = \"MIN: $min \"" | tee $resultfile
+    echo "DETAILS = \"MIN: $min \"" | tee -a $resultfile
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-	echo "DETAILS = \"MIN: $min $y\"" | tee $resultfile
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
-        fi	
-	;;
-	rema_claim_transaction_update)
-    echo "ACTION = rema_status_update" | tee $resultfile
-	echo "DETAILS = \"file: $file | SRCMIN: $srcMin RRN: $RRN \"" | tee $resultfile
+    echo "DETAILS = \"MIN: $min $y\"" | tee -a $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
+        fi  
+    ;;
+    rema_claim_transaction_update)
+    echo "ACTION = rema_status_update" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | SRCMIN: $srcMin RRN: $RRN \"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "DB record claim_flag")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
-	;;
-	bulk_permanent_blocking)
-    echo "ACTION = batch_efs_closure" | tee $resultfile
-	echo "DETAILS = \"file: $file | Check output for list of blocked MINs\"" | tee $resultfile
+    ;;
+    bulk_permanent_blocking)
+    echo "ACTION = batch_efs_closure" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | Check output for list of blocked MINs\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "not_activated")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
         ;;
-	bulk_blocking_accounts_cms)
-    echo "ACTION = batch_cms_closure" | tee $resultfile
-	echo "DETAILS = \"file: $file | Check output for list of blocked MINs\"" | tee $resultfile
+    bulk_blocking_accounts_cms)
+    echo "ACTION = batch_cms_closure" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | Check output for list of blocked MINs\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "procedure successfully completed.")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
-        fi	
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
+        fi  
         ;;
-	lift_dedup_account)
-    echo "ACTION = lift_dedupped_accounts_in_efs" | tee $resultfile
-	echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee $resultfile
+    lift_dedup_account)
+    echo "ACTION = lift_dedupped_accounts_in_efs" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "Updated account_status to ACTIVE")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
         ;;
-	lift_closed_account)
-    echo "ACTION = lift_closed_accounts_in_efs" | tee $resultfile
-	echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee $resultfile
+    lift_closed_account)
+    echo "ACTION = lift_closed_accounts_in_efs" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "Updated account_status to ACTIVE")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
         ;;
-	lift_blacklisted_account)
-    echo "ACTION = lift_blacklisted_accounts_in_efs" | tee $resultfile
-	echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee $resultfile
+    lift_blacklisted_account)
+    echo "ACTION = lift_blacklisted_accounts_in_efs" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "Updated account_status to ACTIVE")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
-	;;
+    ;;
     suspend_accounts)
-    echo "ACTION = batch_efs_suspension" | tee $resultfile
-	echo "DETAILS = \"file: $file | Check output for list of blocked MINs\"" | tee $resultfile
+    echo "ACTION = batch_efs_suspension" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | Check output for list of blocked MINs\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "not_activated")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
-	;;
+    ;;
     batch_cms_suspension)
-    echo "ACTION = batch_cms_suspension" | tee $resultfile
-    echo "DETAILS = \"file: $file | Check MIN status using check_cms_status\"" | tee $resultfile
+    echo "ACTION = batch_cms_suspension" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | Check MIN status using check_cms_status\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "procedure successfully completed.")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
     ;;
     lift_suspended_accounts)
-    echo "ACTION = lift_suspended_accounts_in_efs" | tee $resultfile
-	echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee $resultfile
+    echo "ACTION = lift_suspended_accounts_in_efs" | tee -a $resultfile
+    echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee -a $resultfile
         x=$(cat $logfile | grep -c "Updated account_status to ACTIVE")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
-                echo "STATUS = FAILED" | tee $resultfile
-                echo "$ERROR" | tee $resultfile
+                echo "STATUS = FAILED" | tee -a $resultfile
+                echo "$ERROR" | tee -a $resultfile
         else
-        echo "STATUS = SUCCESSFUL" | tee $resultfile
+        echo "STATUS = SUCCESSFUL" | tee -a $resultfile
         fi
         ;;
 esac
 
-echo "$(cat $resultfile)"  | tee $trail	
+echo "$(cat $resultfile)"  | tee -a $trail 
 
 rm $profile
