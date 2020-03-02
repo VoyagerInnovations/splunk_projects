@@ -84,7 +84,7 @@ case $action in
 	update_profile)
         case $updateProfile in 
 	     tab_update_name)
-             echo "ACTION = update_profile" v $resultfile
+             echo "ACTION = update_profile" | TEE $resultfile
 	         echo "DETAILS = \"MIN: $min FIRST NAME: $updateFName MIDDLE NAME: $updateMName LAST NAME: $updateLName\"" >> $resultfile
              x=$(cat $logfile | grep -c "Done updating the name of the user in the database.")
              if [ $x -eq 0 ]; then
