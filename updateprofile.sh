@@ -153,25 +153,26 @@ case $count in
 	uploadfile	
 	updateaccount
 	;;
-	15)
-	cleanfile
-	rm $lookupDIR/updateprofile_${uname}_result.csv
-	sh -x ${scriptDIR}/.cms_fraud.sh $file >> $logFile
+        15)
+        cleanfile
+        rm $lookupDIR/updateprofile_${uname}_result.csv
+        sh -x ${scriptDIR}/.cms_fraud.sh $file | TEE $logFile
         rm $dump_path/*sql
-	;;
-	16)
-	cleanfile
-	rm $lookupDIR/updateprofile_${uname}_result.csv
-	sh -x ${scriptDIR}/.cms_abusive.sh $file >> $logFile
+        ;;
+        16)
+        cleanfile
+        rm $lookupDIR/updateprofile_${uname}_result.csv
+        sh -x ${scriptDIR}/.cms_abusive.sh $file | TEE $logFile
         rm $dump_path/*sql
-	;;
-	17)
-	cleanfile
-	rm $lookupDIR/updateprofile_${uname}_result.csv
-	rm $lookupDIR/updateprofile_${uname}_cmsresult.csv
+        ;;
+        17)
+        cleanfile
+        rm $lookupDIR/updateprofile_${uname}_result.csv
+        rm $lookupDIR/updateprofile_${uname}_cmsresult.csv
         cd ${scriptDIR}
-        sh -x .check_cms_status.sh $dump_path $file >> $lookupDIR/updateprofile_${uname}_cmsresult.csv
-	;;
+        sh -x .check_cms_status.sh $dump_path $file | TEE $lookupDIR/updateprofile_${uname}_cmsresult.csv
+        ;;
+
 
 esac
 
