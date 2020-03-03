@@ -1,4 +1,3 @@
-pts]$ cat updateprofile.sh
 #!/bin/bash
 #Author: Maynard Louis Prepotente
 #Date: October 3, 2019
