@@ -4,12 +4,13 @@
 
 TS=$(date +"%Y-%m-%d %H:%M:%S")
 fDate=$(date +"%Y-%m-%d")
-logDIR="/apps/splunk/etc/apps/csg/bin/scripts/logs"
+scriptDIR="apps/splunk/etc/apps/sitel/bin/scripts"
+logDIR="${scriptDIR}/logs"
 profile="$1"
-updateprofile="/apps/splunk/etc/apps/csg/bin/scripts/updateprofile.exp"
-dump_path="/apps/splunk/etc/apps/csg/bin/scripts/uploads"
+updateprofile="${scriptDIR}/updateprofile.exp"
+dump_path="${scriptDIR}/uploads"
 lq_path="/home/splunk_user/uploads"
-trail="/apps/splunk/etc/apps/csg/bin/scripts/logs/updateprofile_audit.log.${fDate}"
+trail="${scriptDIR}/logs/updateprofile_audit.log.${fDate}"
 
 #remove quotes on csv file
 sed -i 's/\"//g' $profile
@@ -36,8 +37,8 @@ updateAddressType=`cat $profile | tail -n1 | awk -F',' '{ print $19}'`
 updateBirthday=`cat $profile | tail -n1 | awk -F',' '{ print $20}'`
 updateEAddress=`cat $profile | tail -n1 | awk -F',' '{ print $21}'`
 lq_file="$lq_path/$file"
-logfile="/apps/splunk/etc/apps/csg/bin/scripts/logs/updateprofile.${ticket}.log"
-resultfile="/apps/splunk/etc/apps/csg/lookups/updateprofile_${uname}_result.csv"
+logfile="${scriptDIR}/logs/updateprofile.${ticket}.log"
+resultfile="/apps/splunk/etc/apps/sitel/lookups/updateprofile_${uname}_result.csv"
 
 echo "TIMESTAMP: $TS" | tee -a $resultfile $trail
 echo "USERNAME = $uname" | tee -a $resultfile $trail
