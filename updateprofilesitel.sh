@@ -40,13 +40,13 @@ lq_file="$lq_path/$file"
 
 #Declare variables
 TS=$(date +"%Y-%m-%d")
-updateprofile="/apps/splunk/etc/apps/csg/bin/scripts/updateprofile.exp"
-dump_path="/apps/splunk/etc/apps/csg/bin/scripts/uploads"
-debugFile="/apps/splunk/etc/apps/csg/bin/scripts/logs/updateprofile.debug.$TS"
-logFile="/apps/splunk/etc/apps/csg/bin/scripts/logs/updateprofile.${ticket}.log"
-scriptDIR="/apps/splunk/etc/apps/csg/bin/scripts"
-lookupDIR="/apps/splunk/etc/apps/csg/lookups"
-resultfile="/apps/splunk/etc/apps/csg/lookups/updateprofile_${uname}_result.csv"
+scriptDIR="/apps/splunk/etc/apps/sitel/bin/scripts"
+updateprofile="${scriptDIR}/updateprofile.exp"
+dump_path="${scriptDIR}/uploads"
+debugFile="${scriptDIR}/scripts/logs/updateprofile.debug.$TS"
+logFile="${scriptDIR}/logs/updateprofile.${ticket}.log"
+lookupDIR="/apps/splunk/etc/apps/sitel/lookups"
+resultfile="/apps/splunk/etc/apps/sitel/lookups/updateprofile_${uname}_result.csv"
 
 if [ ! -f "$profile" ] || [ -z "$ticket" ]; then
 	exit;
@@ -56,7 +56,7 @@ exec 1>> $debugFile 2>&1
 
 updateaccount() {
         rm  $lookupDIR/updateprofile_${uname}_result.csv
-        cd /apps/splunk/etc/apps/csg/bin/scripts/
+        cd ${scriptDIR}
         ./updateprofile.exp "$uname" "$count" "$ticket" "$min" "$lname" "$fname" "$oldMin" "$newMin" "$kycId" "$lq_file" "$srcMin" "$RRN" "$updateFName" "$updateMName" "$updateLName" "$updateAddressName" "$updateAddressValue" "$updateAddressType" "$updateBirthday" "$updateEAddress" "$updateProfile" "$logFile" 
 }
 
