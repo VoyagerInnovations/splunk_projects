@@ -189,7 +189,7 @@ case $action in
     lift_dedup_account)
     echo "ACTION = lift_dedupped_accounts_in_efs" | tee -a $resultfile
     echo "DETAILS = \"file: $file | Check output for list of MINs\"" | tee -a $resultfile
-        x=$(cat $logfile | grep -c "Updated account_status to ACTIVE")
+        x=$(cat $logfile | grep -c "Done")
         if [ $x -eq 0 ]; then
         ERROR=$(cat $logfile | egrep -i "ERROR|INFO|NOTICE")
                 echo "STATUS = FAILED" | tee -a $resultfile
