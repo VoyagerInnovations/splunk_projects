@@ -18,8 +18,8 @@ set updateMName [lindex $argv 13]
 set updateLName [lindex $argv 14]
 set updateAddressName [lindex $argv 15]
 set updateAddressValue [lindex $argv 16]
-set updateAddressType [lindex $argv 17]
-set updateBirthday [lindex $argv 18]
+set updateEfsCode [lindex $argv 17]
+set updateAltType [lindex $argv 18]
 set updateEAddress [lindex $argv 19]
 set updateProfile [lindex $argv 20]
 set logger [lindex $argv 21]
@@ -85,7 +85,7 @@ send "$lname,$fname\r"
 	expect "New Alt Contact:"
 	send "$updateEAddress\r"
 	expect "New Contact Type: (email/msisdn)"
-	send "email\r"
+	send "$updateAltType\r"
        }
 } elseif { $count == 5 } {
 expect "Please choose an action:"
@@ -101,6 +101,8 @@ expect "Please choose an action:"
 send "$count\r"
 expect  "Please input file path (e.g./home/dpmanoso/RFC-123-mins.txt):"
 send "$file\r"
+expect "Please choose a reason code for closing:"
+send "$updateEfsCode\r"
 } elseif { $count == 7 } {
 expect "Please choose an action:"
 send "$count\r"
@@ -137,6 +139,8 @@ expect "Please choose an action:"
 send "$count\r"
 expect "Please input file path (e.g./home/dpmanoso/RFC-123-mins.txt):"
 send "$file\r"
+expect "Please choose a reason code for closing:"
+send "$updateEfsCode\r"
 } elseif { $count == 13 } {
 expect "Please choose an action:"
 send "$count\r"
@@ -154,7 +158,3 @@ send "$RRN\r"
 expect "Would you like to do another transaction? (y/n):"
 send "n"
 exit;
-
-
-
-
