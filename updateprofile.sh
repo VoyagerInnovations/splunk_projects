@@ -2,7 +2,6 @@
 #Author: Maynard Louis Prepotente
 #Date: October 3, 2019
 #Splunk to Liquibase Update Account Profile
-#Testing
 
 set -v
 #exec 3>&1 4>&2
@@ -32,21 +31,21 @@ updateMName=`cat $profile | tail -n1 | awk -F',' '{ print $15}'`
 updateLName=`cat $profile | tail -n1 | awk -F',' '{ print $16}'` 
 updateAddressName=`cat $profile | tail -n1 | awk -F',' '{ print $17}'` 
 updateAddressValue=`cat $profile | tail -n1 | awk -F',' '{ print $18}'` 
-updateAddressType=`cat $profile | tail -n1 | awk -F',' '{ print $19}'` 
-updateBirthday=`cat $profile | tail -n1 | awk -F',' '{ print $20}'`
+updateEfsCode=`cat $profile | tail -n1 | awk -F',' '{ print $19}'` 
+updateAltType=`cat $profile | tail -n1 | awk -F',' '{ print $20}'`
 updateEAddress=`cat $profile | tail -n1 | awk -F',' '{ print $21}'`
 lq_path="/home/splunk_user/uploads"
 lq_file="$lq_path/$file"
 
 #Declare variables
 TS=$(date +"%Y-%m-%d")
-updateprofile="/apps/splunk/etc/apps/csg/bin/scripts/updateprofile.exp"
-dump_path="/apps/splunk/etc/apps/csg/bin/scripts/uploads"
-debugFile="/apps/splunk/etc/apps/csg/bin/scripts/logs/updateprofile.debug.$TS"
-logFile="/apps/splunk/etc/apps/csg/bin/scripts/logs/updateprofile.${ticket}.log"
-scriptDIR="/apps/splunk/etc/apps/csg/bin/scripts"
-lookupDIR="/apps/splunk/etc/apps/csg/lookups"
-resultfile="/apps/splunk/etc/apps/csg/lookups/updateprofile_${uname}_result.csv"
+updateprofile="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/updateprofile.exp"
+dump_path="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/uploads"
+debugFile="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/logs/updateprofile.debug.$TS"
+logFile="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/logs/updateprofile.${ticket}.log"
+scriptDIR="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts"
+lookupDIR="/apps/splunk/etc/apps/Business_Operations_Support/lookups"
+resultfile="/apps/splunk/etc/apps/Business_Operations_Support/lookups/updateprofile_${uname}_result.csv"
 
 if [ ! -f "$profile" ] || [ -z "$ticket" ]; then
 	exit;
@@ -56,18 +55,26 @@ exec 1>> $debugFile 2>&1
 
 updateaccount() {
         rm  $lookupDIR/updateprofile_${uname}_result.csv
-        cd /apps/splunk/etc/apps/csg/bin/scripts/
-        ./updateprofile.exp "$uname" "$count" "$ticket" "$min" "$lname" "$fname" "$oldMin" "$newMin" "$kycId" "$lq_file" "$srcMin" "$RRN" "$updateFName" "$updateMName" "$updateLName" "$updateAddressName" "$updateAddressValue" "$updateAddressType" "$updateBirthday" "$updateEAddress" "$updateProfile" "$logFile" 
+        cd ${scriptDIR}
+        ./updateprofile.exp "$uname" "$count" "$ticket" "$min" "$lname" "$fname" "$oldMin" "$newMin" "$kycId" "$lq_file" "$srcMin" "$RRN" "$updateFName" "$updateMName" "$updateLName" "$updateAddressName" "$updateAddressValue" "$updateEfsCode" "$updateAltType" "$updateEAddress" "$updateProfile" "$logFile" 
 }
 
 cleanfile() {
+ /apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/fetch_file.sh "$file"
  dos2unix $dump_path/$file
 }
+
 uploadfile() {
  echo $dump_path/$file
  scp $dump_path/$file splunk_user@172.18.106.177:/home/splunk_user/uploads/.
 }
 
+efsclosure() {
+ echo "$min" >> "${dump_path}/${ticket}_efsclosure.txt"
+ count=6
+ file="${ticket}_efsclosure.txt"
+ lq_file="$lq_path/$file" 
+}
 
 case $updateProfile in 
      tab_update_name)
@@ -87,6 +94,17 @@ case $updateProfile in
      ;;
 esac
 
+case $updateEfsCode in
+	blacklist)
+	updateEfsCode=1
+        ;;
+	dedup)
+	updateEfsCode=2
+        ;;
+	close)
+	updateEfsCode=3
+	;;
+esac
 echo $TS $logFile
 
 case $action in 
@@ -142,6 +160,12 @@ case $action in
 	check_cms_status)
 	count=17
 	;;
+	efs_account_closure)
+	count=18
+	;;
+	reset_cms_limit)
+	count=19
+	;;
 esac
 
 case $count in 
@@ -153,29 +177,38 @@ case $count in
 	uploadfile	
 	updateaccount
 	;;
-        15)
-        cleanfile
-        rm $lookupDIR/updateprofile_${uname}_result.csv
-        sh -x ${scriptDIR}/.cms_fraud.sh $file | TEE $logFile
+	15)
+	cleanfile
+	rm $lookupDIR/updateprofile_${uname}_result.csv
+	sh -x ${scriptDIR}/.cms_fraud.sh $file >> $logFile
         rm $dump_path/*sql
-        ;;
-        16)
-        cleanfile
-        rm $lookupDIR/updateprofile_${uname}_result.csv
-        sh -x ${scriptDIR}/.cms_abusive.sh $file | TEE $logFile
+	;;
+	16)
+	cleanfile
+	rm $lookupDIR/updateprofile_${uname}_result.csv
+	sh -x ${scriptDIR}/.cms_abusive.sh $file >> $logFile
         rm $dump_path/*sql
-        ;;
-        17)
-        cleanfile
-        rm $lookupDIR/updateprofile_${uname}_result.csv
-        rm $lookupDIR/updateprofile_${uname}_cmsresult.csv
+	;;
+	17)
+	cleanfile
+	rm $lookupDIR/updateprofile_${uname}_result.csv
+	rm $lookupDIR/updateprofile_${uname}_cmsresult.csv
         cd ${scriptDIR}
-        sh -x .check_cms_status.sh $dump_path $file | TEE $lookupDIR/updateprofile_${uname}_cmsresult.csv
-        ;;
-
+        sh -x .check_cms_status.sh $dump_path $file >>  $lookupDIR/updateprofile_${uname}_cmsresult.csv
+	;;
+	18)
+	efsclosure
+	uploadfile
+	updateaccount
+	;;
+	19)
+	cleanfile
+	rm $lookupDIR/updateprofile_${uname}_result.csv
+        sh -x ${scriptDIR}/.cms_reset_high_risk.sh $dump_path $file >> $logFile
+        rm $dump_path/*sql
+	;;
 
 esac
 
 echo "Transaction completed at $TS"
 sh ${scriptDIR}/.audit_logger.sh $profile
-
