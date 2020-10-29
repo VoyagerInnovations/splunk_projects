@@ -38,14 +38,14 @@ lq_path="/home/splunk_user/uploads"
 lq_file="$lq_path/$file"
 
 #Declare variables
-TS=$(date +"%Y-%m-%d")
-updateprofile="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/updateprofile.exp"
-dump_path="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/uploads"
-debugFile="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/logs/updateprofile.debug.$TS"
-logFile="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/logs/updateprofile.${ticket}.log"
-scriptDIR="/apps/splunk/etc/apps/Business_Operations_Support/bin/scripts"
-lookupDIR="/apps/splunk/etc/apps/Business_Operations_Support/lookups"
-resultfile="/apps/splunk/etc/apps/Business_Operations_Support/lookups/updateprofile_${uname}_result.csv"
+TS=$(date +"%Y-%m-%d %T")
+updateprofile="/apps/splunk/etc/apps/frm/bin/scripts/updateprofile.exp"
+dump_path="/apps/splunk/etc/apps/frm/bin/scripts/uploads"
+debugFile="/apps/splunk/etc/apps/frm/bin/scripts/logs/updateprofile.debug.$TS"
+logFile="/apps/splunk/etc/apps/frm/bin/scripts/logs/updateprofile.${ticket}.log"
+scriptDIR="/apps/splunk/etc/apps/frm/bin/scripts"
+lookupDIR="/apps/splunk/etc/apps/frm/lookups"
+resultfile="/apps/splunk/etc/apps/frm/lookups/updateprofile_${uname}_result.csv"
 
 if [ ! -f "$profile" ] || [ -z "$ticket" ]; then
 	exit;
@@ -60,7 +60,7 @@ updateaccount() {
 }
 
 cleanfile() {
- /apps/splunk/etc/apps/Business_Operations_Support/bin/scripts/fetch_file.sh "$file"
+ /apps/splunk/etc/apps/frm/bin/scripts/fetch_file.sh "$file"
  dos2unix $dump_path/$file
 }
 
