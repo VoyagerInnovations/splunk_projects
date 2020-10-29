@@ -139,7 +139,7 @@ expect "Please choose an action:"
 send "$count\r"
 expect "Please input file path (e.g./home/dpmanoso/RFC-123-mins.txt):"
 send "$file\r"
-expect "Please choose a reason code for closing:"
+expect "Please choose a reason code for suspension:"
 send "$updateEfsCode\r"
 } elseif { $count == 13 } {
 expect "Please choose an action:"
