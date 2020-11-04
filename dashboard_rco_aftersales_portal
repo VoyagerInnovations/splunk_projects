@@ -1,0 +1,409 @@
+<form script="uap.js" stylesheet="uap.css" theme="dark">
+  <label>PayMaya Issuing Aftersales Portal</label>
+  <search>
+    <done>
+      <condition>
+        <set token="panelresult_show">true</set>
+      </condition>
+    </done>
+    <query>
+                 | makeresults 
+                 | eval currentUser= $currentUser|s$
+                 | eval jira= $tkn_jira|s$
+                 | eval action= $myToken|s$
+                 | eval min= $tkn_min|s$
+                 | eval lname= $tkn_lName|s$
+                 | eval fname= $tkn_fName|s$
+                 | eval oldMin= " "
+                 | eval newMin= " "
+                 | eval kycId= " "
+                 | eval updateProfile= " "
+                 | eval updateFName= " "
+                 | eval updateMName= " "
+                 | eval updateLName= " "
+                 | eval updateAddressName= " "
+                 | eval updateAddressValue= " "
+                 | eval updateEfsCode= $tkn_efsCode|s$
+                 | eval updateAltType= " "
+                 | eval updateEAddress= " "
+                 | eval file= $tkn_file|s$
+                 | eval srcMin= " "
+                 | eval RRN= " "
+                 | table currentUser action jira min lname fname oldMin newMin kycId file srcMin RRN updateProfile updateFName updateMName updateLName updateAddressName updateAddressValue updateEfsCode updateAltType updateEAddress
+                 | outputcsv $env:user$.csv 
+          </query>
+  </search>
+  <!-- Update Profile
+  <row id="bin_console6">
+    <panel>
+      <input type="text" token="tkn_updateFName" id="input_ufn">
+        <label>First Name</label>
+        <default></default>
+      </input>
+      <input type="text" token="tkn_updateMName" id="input_umn">
+        <label>Middle Name</label>
+        <default></default>
+      </input>
+      <input type="text" token="tkn_updateLName" id="input_uln">
+        <label>Last Name</label>
+        <default></default>
+      </input>
+    </panel>
+  </row>
+  <row id="bin_console7">
+    <panel>
+      <input type="text" token="tkn_updateAddressName" id="input_uan">
+        <label>Address Field Name</label>
+        <default></default>
+      </input>
+      <input type="text" token="tkn_updateAddressValue" id="input_uav">
+        <label>Address Field Value</label>
+        <default></default>
+      </input>
+      <input type="text" token="tkn_updateAddressType" id="input_uat">
+        <label>Type(PERMANENT,PRESENT,BOTH)</label>
+        <default></default>
+      </input>
+    </panel>
+  </row>
+  <row id="bin_console8">
+    <panel>
+      <input type="text" token="tkn_updateBirthday" id="input_ub">
+        <label>Birthday (MM-DD-YYYY)</label>
+        <default></default>
+      </input>
+    </panel>
+  </row>
+  -->
+  <fieldset submitButton="true" autoRun="false">
+    <input type="text" id="input_jira" token="tkn_jira">
+      <label>Enter Case Number (alphanumeric/hyphen CASE-00001)</label>
+    </input>
+  </fieldset>
+  <row>
+    <panel>
+      <html> 
+      <ul id="tabs" class="nav nav-tabs"> 
+        <li class="active"> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console0" data-token="selection">Home</a> 
+        </li> 
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console1,bin_console12" data-token="block_and_create_new_virtual_account">Virtual Card Replacement</a> 
+        </li> 
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console42,bin_console1" data-token="efs_account_closure" id="tab_efs_account_closure">EFS Account Closure</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console4" data-token="bulk_blocking_accounts_cms">Batch CMS Closure</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console4" data-token="lift_dedup_account">Lift Dedupped Accounts in EFS</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console4" data-token="lift_closed_account">Lift Closed Accounts in EFS</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console4" data-token="lift_blacklisted_account">Lift Blacklisted Accounts in EFS</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console42,bin_console4" data-token="suspend_accounts">Batch EFS Suspension</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console4" data-token="batch_cms_suspension">Batch CMS Suspension</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console4" data-token="lift_suspended_accounts">Lift Suspended Accounts in EFS</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console4,bin_console10" data-token="check_cms_status">Check CMS Status</a> 
+        </li>
+        <li> 
+          <a href="https://splunk-rco.corp.paymaya.com/en-US/manager/search/adddatamethods/selectsource?input_mode=0" target="_blank" class="toggle-tab" data-elements="" data-token="uploader">Batch File Uploader</a> 
+        </li>
+        <li> 
+          <a href="#" class="toggle-tab" data-toggle="tab" data-elements="bin_console11" data-token="efs_audit_trail">EFS Audit Trail</a> 
+        </li>
+      </ul> 
+    </html>
+    </panel>
+  </row>
+  <row id="bin_console0">
+    <panel>
+      <html>
+      <h1>PayMaya Issuing Aftersales Tool Usage</h1>
+        <br/>
+      <ol>
+        <li>Enter ticket reference number </li>
+        <li>Choose action from the tab selection</li>
+        <li>Fill up the required information correctly</li>
+        <li>Click the submit button</li>
+        <li>Transaction result can be viewed on the panel below</li>
+      </ol>
+      <h1>Audit Log Tracing</h1>
+      <br/>
+      <ol>
+        <li>Select transaction date from the dropdown menu</li>
+        <li>Input first name / last name to filter results for a specific user</li>
+        <li>Input ticket reference to filter results for a specific ticket</li>
+      </ol>
+      <br/>
+      <br/>
+      <h1 style="color:red">#################WARNING################
+      <br/>#DO NOT REFRESH PAGE AFTER CLICKING SUBMIT  #
+      <br/>########################################</h1>
+      </html>
+    </panel>
+    <panel>
+      <html>
+      <h1>Single Account Processing</h1>
+      <h3>Virtual Card Replacement</h3>
+      <p>Blocking of virtual account then pulling a new one</p>
+      <h3>MIN De-registration from Account</h3>
+      <p>Account deregistered to MIN in EFS. MIN can pull another account after 60 days</p>
+      <h3>MIN Reassignment</h3>
+      <p>Reassignment of account from old MIN to new MIN</p>
+      <h3>Update Profile</h3>
+      <p>Update of name, address, birthday and alternative contact</p>
+      <h3>Fix Plus Account Already exist</h3>
+      <p>Downgrade kyc status from 1 to 0 for the accounts that encountered timeout on portal but still pushed thru in DB (no longer being used since fix was already deployed)</p>
+      <h3>Downgrade KYC1 to KYC0</h3>
+      <p>Downgrading of kyc status from 1 to 0</p>
+      <h3>Remittance Status Update</h3>
+      <p>Updating of REMA claim status from 0 (ACTIVE) to 3 (MANUALLY UPDATED)</p>
+      </html>
+    </panel>
+    <panel>
+      <html>
+      <h1>Batch  Proccessing</h1>
+      <h3>Batch EFS closure </h3>
+      <p>Tagging the account as "closed" in EFS DB. Usual requests were due to possible fraud and dedup</p>
+      <h3>Batch CMS closure</h3>
+      <p>Tagging the account as "closed" in CMS DB. Usual requests were due to possible fraud. Close code "A"</p>  
+      <h3>Lift Dedupped Accounts in EFS</h3>
+      <p>Lifting of dedup status in EFS (LIMITED status due to having same name and date of birth) of accounts</p>
+      <h3>Lift Closed Accounts in EFS</h3>
+      <p>Lifting of closed status of accounts in EFS</p>
+      <h3>Lift Blacklisted Accounts in EFS</h3>
+      <p>Lifting of blacklisted accounts in EFS</p>
+      <h3>Batch EFS Suspension</h3>
+      <p>Suspend accts due to abusive usage (usually due to multiple insufficient fund error). EFS Status will be "Suspended"</p>
+      <h3>Batch CMS Suspension</h3>
+      <p>EFS Status will be suspended. Cancel code in CMS will be V "Abusive Usage"</p>
+      <h3>Lift Suspended Accounts in EFS</h3>
+      <p>Lifting of suspended (abusive) accounts</p>  
+      </html>
+    </panel>
+  </row>
+  <row id="bin_console1">
+    <panel>
+      <title>Enter Account Details</title>
+      <input type="text" token="tkn_min" id="input_min">
+        <label>MIN (+639XXXXXXXXX)</label>
+        <default></default>
+      </input>
+    </panel>
+  </row>
+  <row id="bin_console12">
+    <panel>
+      <input type="text" token="tkn_lName" id="input_lname">
+        <label>Last Name</label>
+        <default></default>
+      </input>
+      <input type="text" token="tkn_fName" id="input_fname">
+        <label>First Name</label>
+        <default></default>
+      </input>
+    </panel>
+  </row>
+  <row id="bin_console4">
+    <panel>
+      <title>Enter Details</title>
+      <input type="text" token="tkn_file" id="input_file">
+        <label>Filename</label>
+        <default></default>
+      </input>
+    </panel>
+  </row>
+   <row id="bin_console42">
+    <panel>
+      <input type="radio" token="tkn_efsCode">
+        <label>Choose Blocking Reason Code</label>
+         <choice value="close">CLOSE / INACTIVE</choice>
+         <choice value="dedup">DUPLICATE / DEDUPED_ACCOUNT</choice>
+         <choice value="blacklist">BLACKLIST</choice>
+        <default>close</default>
+        <initialValue>close</initialValue>
+      </input>
+    </panel>
+  </row>
+  <row id="bin_console10">
+    <panel>
+      <title>CMS Account Status</title>
+      <table>
+        <search>
+          <query>| inputlookup updateprofile_$env:user$_cmsresult.csv</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <refresh>5s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">20</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+  </row>
+  <row id="bin_console11">
+    <panel>
+      <title>EFS Audit Trail</title>
+      <input type="text" token="tkn_efsdetail" searchWhenChanged="true">
+        <label>Enter MIN / DETAILS</label>
+        <default>*</default>
+      </input>
+      <input type="time" token="tkn_efstimerange" searchWhenChanged="true">
+        <label>Date</label>
+        <default>
+          <earliest>@d</earliest>
+          <latest>now</latest>
+        </default>
+      </input>
+      <table>
+        <search>
+          <query>index=main sourcetype="aftersales_audit" $tkn_efsdetail$  
+                | reverse
+                | rex field=source "^.+?\/[\w]+\.(?&lt;TICKET&gt;.+)\.log" 
+                | stats list(_raw) as LOGS by TICKET 
+                | join TICKET 
+                    [ search index="main" sourcetype="aftersales_audit_trail" 
+                    | transaction startswith="TIMESTAMP" ] 
+                | table TICKET USERNAME ACTION STATUS DETAILS LOGS</query>
+                          <earliest>$tkn_efstimerange.earliest$</earliest>
+          <latest>$tkn_efstimerange.latest$</latest>
+        </search>
+        <option name="count">1</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panelResult_show$">
+      <title>Result</title>
+      <table>
+        <search>
+          <query>| inputlookup updateprofile_$env:user$_result.csv</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <refresh>5s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$panelresult_show$">
+      <title>Result</title>
+      <table>
+        <search>
+          <query>| inputlookup updateprofile_$env:user$_result.csv | head 5</query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+          <refresh>5s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">100</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="wrap">false</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <title>Audit Log</title>
+      <input type="dropdown" token="timerange_from" searchWhenChanged="true">
+        <label>Date From</label>
+        <fieldForLabel>label</fieldForLabel>
+        <fieldForValue>value</fieldForValue>
+        <search>
+          <query> | gentimes start=1/1/20 end=+1 
+                  | eval label=strftime(starttime, "%Y-%b-%d") 
+                  | eval value="earliest=".'starttime'
+                  | sort -endtime
+          </query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+      </input>
+      <input type="dropdown" token="timerange_to" searchWhenChanged="true">
+        <label>Date To</label>
+        <fieldForLabel>label</fieldForLabel>
+        <fieldForValue>value</fieldForValue>
+        <search>
+          <query> | gentimes start=1/1/20 end=+1
+                  | eval label=strftime(starttime, "%Y-%b-%d")
+                  | eval value="latest=".'endtime'
+                  | sort -endtime
+          </query>
+          <earliest>-15m</earliest>
+          <latest>now</latest>
+        </search>
+      </input>
+      <input type="text" token="username" searchWhenChanged="true">
+        <label>Username</label>
+        <default>*</default>
+        <prefix>USERNAME="*</prefix>
+        <suffix>*"</suffix>
+        <initialValue>*</initialValue>
+      </input>
+      <input type="text" token="jiraticket" searchWhenChanged="true">
+        <label>Ticket  Reference</label>
+        <prefix>TICKET="*</prefix>
+        <suffix>*"</suffix>
+        <initialValue>*</initialValue>
+        <default>*</default>
+      </input>
+      <input type="text" token="detailsaction" searchWhenChanged="true">
+        <label>Action</label>
+        <prefix>ACTION="*</prefix>
+        <suffix>*"</suffix>
+        <initialValue>*</initialValue>
+        <default>*</default>
+      </input>
+      <input type="text" token="detailsmin" searchWhenChanged="true">
+        <label>Details</label>
+        <prefix>DETAILS="*</prefix>
+        <suffix>*"</suffix>
+        <initialValue>*</initialValue>
+        <default>*</default>
+      </input>
+      <table>
+        <search>
+          <query>index="main" $timerange_from$ $timerange_to$ sourcetype="aftersales_audit_trail" | transaction startswith="TIMESTAMP" | search $username$ $jiraticket$ $detailsaction$ $detailsmin$ | table _time USERNAME TICKET ACTION DETAILS STATUS</query>
+          <earliest>0</earliest>
+          <latest></latest>
+          <sampleRatio>1</sampleRatio>
+          <refresh>1m</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="count">10</option>
+        <option name="dataOverlayMode">none</option>
+        <option name="drilldown">none</option>
+        <option name="percentagesRow">false</option>
+        <option name="refresh.display">progressbar</option>
+        <option name="rowNumbers">false</option>
+        <option name="totalsRow">false</option>
+        <option name="wrap">true</option>
+      </table>
+    </panel>
+  </row>
+</form>
