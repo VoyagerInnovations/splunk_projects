@@ -1,0 +1,539 @@
+<form>
+  <init>
+    <set token="tkn_avail_bal">-</set>
+    <set token="tkn_cur_bal">-</set>
+    <set token="tkn_kyc_name">-</set>
+    <set token="tkn_kyc_nty">-</set>
+    <set token="tkn_kyc_dob">-</set>
+    <set token="tkn_kyc_pob">-</set>
+    <set token="tkn_kyc_cnt_type">-</set>
+    <set token="tkn_kyc_ctd_at">-</set>
+    <set token="tkn_kyc_utd_by">-</set>
+    <set token="tkn_kyc_utd_at">-</set>
+    <set token="tkn_kyc_pstaddr">-</set>
+    <set token="tkn_kyc_pmtaddr">-</set>
+    <set token="tkn_kyc_deladdr">-</set>
+    <set token="tkn_kyc_status">-</set>
+    <set token="tkn_kyc_val_code">-</set>
+    <set token="tkn_kyc_inst_card">-</set>
+    <set token="tkn_kyc_rmk">-</set>
+    <set token="tkn_kyc_soi">-</set>
+    <set token="tkn_kyc_now">-</set>
+    <set token="tkn_kyc_ssn">-</set>
+    <set token="tkn_kyc_tin">-</set>
+    <set token="tkn_kyc_blk">-</set>
+    <set token="tkn_kyc_emp_dtl">-</set>
+    <set token="tkn_login_os">-</set>
+    <set token="tkn_login_device">-</set>
+    <set token="tkn_login_appver">-</set>
+    <set token="tkn_login_ipaddr">-</set>
+    <set token="tkn_login_location">-</set>
+  </init>
+  <label>PayMaya Customer ID Dashboard</label>
+  <!-- Profile Search -->
+  <search>
+    <query>  
+          index=profile_eps_index sec_lstyle_id=$tkn_input$
+          | fillnull value="-" creation_date first_name last_name birthdate alt_contact kyc_status account_status account_type work_nature line1 line2 locality city state_prov country zipcode type sec_lstyle_id reason_code remarks
+          | stats latest(creation_date) as creation_date latest(first_name) as first_name latest(last_name) as last_name latest(birthdate) as birthdate latest(alt_contact) as alt_contact latest(kyc_status) as kyc_status latest(account_status) as account_status latest(account_type) as account_type latest(work_nature) as work_nature latest(line1) as line1 latest(line2) as line2 latest(locality) as locality latest(city) as city latest(state_prov) as state_prov latest(country) as country latest(zipcode) as zipcode latest(type) as type values(fund_source_id) as fund_source_id latest(reason_code) as reason_code latest(remarks) as remarks by sec_lstyle_id 
+          | eval fsid=mvjoin(fund_source_id,",") 
+          | eval kyc_clr=if(kyc_status=="1","#8bc34a","#d50000") 
+          | eval efs_clr=if(account_status="ACTIVE","#8bc34a","#d50000") 
+          | table creation_date first_name last_name birthdate alt_contact kyc_status account_status account_type work_nature line1 line2 locality city state_prov country zipcode type sec_lstyle_id fsid reason_code remarks kyc_clr efs_clr
+    </query>
+    <earliest>0</earliest>
+    <latest>now</latest>
+    <finalized>
+      <condition match="'job.resultCount' != 0">
+        <set token="tkn_pid_cdate">$result.creation_date$</set>
+        <set token="tkn_pid_name">$result.first_name$ $result.last_name$</set>
+        <set token="tkn_pid_min">$result.sec_lstyle_id$</set>
+        <set token="tkn_pid_kyc_status">$result.kyc_status$</set>
+        <set token="tkn_pid_efs_status">$result.account_status$</set>
+        <set token="tkn_pid_efs_type">$result.account_type$</set>
+        <set token="tkn_pid_alt_contact">$result.alt_contact$</set>
+        <set token="tkn_pid_fname">$result.first_name$</set>
+        <set token="tkn_pid_lname">$result.last_name$</set>
+        <set token="tkn_pid_nat">$result.country$</set>
+        <set token="tkn_pid_dob">$result.birthdate$</set>
+        <set token="tkn_pid_addl1">$result.line1$</set>
+        <set token="tkn_pid_addl2">$result.line2$</set>
+        <set token="tkn_pid_bgy">$result.locality$</set>
+        <set token="tkn_pid_cty">$result.city$</set>
+        <set token="tkn_pid_state">$result.state_prov$</set>
+        <set token="tkn_pid_zip">$result.zipcode$</set>
+        <set token="tkn_pid_ctry">$result.country$</set>
+        <set token="tkn_pid_fsid">$result.fsid$</set>
+        <set token="tkn_pid_rcode">$result.reason_code$</set>
+        <set token="tkn_pid_rmk">$result.remarks$</set>
+        <set token="pid_kyc_clr">$result.kyc_clr$</set>
+        <set token="pid_efs_clr">$result.efs_clr$</set>
+        <set token="tkn_avail_bal">-</set>
+        <set token="tkn_cur_bal">-</set>
+      </condition>
+    </finalized>
+  </search>
+  <search>
+    <query> 
+      index=negosyo_profile_eps sourcetype=negosyo_kycDetails msisdn=$tkn_input$
+      | eval account_name=upper(firstName." ".middleName." ".lastName)
+      | eval present_address=upper(presentAddressLine1.presentAddressLine2.presentAddressLocality.presentAddressCity.presentAddressState.presentAddressZipCode.presentAddressCountry)
+      | eval permanent_address=upper(permanentAddressLine1.permanentAddressLine2.permanentAddressLocality.permanentAddressCity.permanentAddressState.permanentAddressZipCode.permanentAddressCountry)
+      | stats latest(account_name) as  account_name latest(nationality) as nationality latest(birthDate) as birth_date latest(birthPlaceCity) as birth_place latest(client_type) as client_type latest(createdAt)  as created_at latest(updated_by) as updated_by latest(updatedAt) as updated_at latest(present_address) as     present_address latest(permanent_address) as permanent_address latest(delivery_address) as delivery_address latest(status) as status latest(id) as reference_id latest(instant_card) as instant_card latest(remarks) as remarks latest(incomeSource) as income_source latest(workNature) as work_nature latest(socialSecurityNumber) as social_security latest(tin) as tin latest(blacklisted) as blacklisted latest(employmentDetail) as employment_detail by msisdn
+      | fields - msisdn 
+    </query>
+
+    <earliest>0</earliest>
+    <latest>now</latest>
+     <done>
+      <condition match="'job.resultCount' != 0">
+        <set token="tkn_kyc_name">$result.account_name$</set>
+        <set token="tkn_kyc_nty">$result.nationality$</set>
+        <set token="tkn_kyc_dob">$result.birth_date$</set>
+        <set token="tkn_kyc_pob">$result.birth_place$</set>
+        <set token="tkn_kyc_cnt_type">-</set>
+        <set token="tkn_kyc_ctd_at">$result.created_at$</set>
+        <set token="tkn_kyc_utd_by">-</set>
+        <set token="tkn_kyc_utd_at">$result.updated_at$</set>
+        <set token="tkn_kyc_pstaddr">$result.present_address$</set>
+        <set token="tkn_kyc_pmtaddr">$result.permanent_address$</set>
+        <set token="tkn_kyc_deladdr">-</set>
+        <set token="tkn_kyc_status">$result.status$</set>
+        <set token="tkn_kyc_val_code">$result.reference_id$</set>
+        <set token="tkn_kyc_inst_card">-</set>
+        <set token="tkn_kyc_rmk">-</set>
+        <set token="tkn_kyc_soi">$result.income_source$</set>
+        <set token="tkn_kyc_now">$result.work_nature$</set>
+        <set token="tkn_kyc_ssn">$result.social_security$</set>
+        <set token="tkn_kyc_tin">$result.tin$</set>
+        <set token="tkn_kyc_blk">-</set>
+        <set token="tkn_kyc_emp_dtl">$result.employment_detail$</set>
+        <unset token="tkn_get_kyc_db"></unset>
+      </condition>
+      <condition match="'job.resultCount'== 0">
+         <set token="tkn_get_kyc_db">true</set>
+      </condition>
+    </done>
+  </search>  
+  <search>
+    <query>
+            | getuserprofile $env:user$ $tkn_pid_fsid|s$ $tkn_pid_min$
+    </query>
+    <done>
+      <set token="tkn_show_data">true</set>
+    </done>
+  </search>
+  <search>
+    <query>
+            index=glimpse_index "m.uid"=$tkn_input$
+            | head 1
+            | stats latest(tid) as os latest(ua) as device_info latest(av) as app_version by m.uid
+    </query>
+    <earliest>-7d@d</earliest>
+    <latest>now</latest>
+    <done>
+      <condition match="'job.resultCount' != 0">
+        <set token="tkn_login_os">$result.os$</set>
+        <set token="tkn_login_device">$result.device_info$</set>
+        <set token="tkn_login_appver">$result.app_version$</set>
+      </condition>
+      <condition match="'job.resultCount' == 0">
+        <set token="tkn_login_os">-</set>
+        <set token="tkn_login_device">-</set>
+        <set token="tkn_login_appver">-</set>
+      </condition>
+    </done>
+  </search>
+  <search depends="$tkn_get_kyc_db$">
+    <query>
+           | inputlookup $env:user$_kyc.csv 
+           | dedup msisdn sortby status 
+           | eval birth_place=upper(replace(replace(replace(birth_place, "\"\}", ""), "\{\"city\"\:\"", ""), "\"\,\"country\"\:\"", " "))
+           | eval updated_by=upper(replace(replace(replace(updated_by, "\"\}", ""), "\{\"user_id\"\:\"BUS0440000005160\"\,", ""), "\"username\"\:\"", " "))
+           | eval present_address=upper(replace(replace(replace(replace(replace(replace(replace(present_address, "\"\}", ""), "\{\"line1\"\:\"", ""), "\"\,\"locality\"\:\"", " "),"\"\,\"zip_code\"\:\""," "),"\"\,\"country\"\:\""," "),"\"\,\"state\"\:\""," "),"\"\,\"city\"\:\""," "))
+           | eval permanent_address=upper(replace(replace(replace(replace(replace(replace(replace(permanent_address, "\"\}", ""), "\{\"line1\"\:\"", ""), "\"\,\"locality\"\:\"", " "),"\"\,\"zip_code\"\:\""," "),"\"\,\"country\"\:\""," "),"\"\,\"state\"\:\""," "),"\"\,\"city\"\:\""," "))
+           | eval delivery_address=upper(replace(replace(replace(replace(replace(replace(replace(delivery_address, "\"\}", ""), "\{\"line1\"\:\"", ""), "\"\,\"locality\"\:\"", " "),"\"\,\"zip_code\"\:\""," "),"\"\,\"country\"\:\""," "),"\"\,\"state\"\:\""," "),"\"\,\"city\"\:\""," "))
+           | eval account_name = upper(first_name." ".last_name)
+           | eval status=upper(status)
+           | eval income_source=upper(income_source)
+           | eval work_nature=upper(work_nature)
+           | eval remarks=upper(remarks." ".reason)
+           | eval blacklisted=upper(blacklisted)
+           | fillnull value="-"
+           | table account_name nationality birth_date birth_place client_type created_at updated_by updated_at present_address permanent_address delivery_address status reference_id instant_card remarks income_source work_nature social_security tin blacklisted employment_detail
+    </query>
+        <refresh>2s</refresh>
+    <finalized>
+      <condition match="'job.resultCount' != 0">
+        <set token="tkn_kyc_name">$result.account_name$</set>
+        <set token="tkn_kyc_nty">$result.nationality$</set>
+        <set token="tkn_kyc_dob">$result.birth_date$</set>
+        <set token="tkn_kyc_pob">$result.birth_place$</set>
+        <set token="tkn_kyc_cnt_type">$result.client_type$</set>
+        <set token="tkn_kyc_ctd_at">$result.created_at$</set>
+        <set token="tkn_kyc_utd_by">$result.updated_by$</set>
+        <set token="tkn_kyc_utd_at">$result.updated_at$</set>
+        <set token="tkn_kyc_pstaddr">$result.present_address$</set>
+        <set token="tkn_kyc_pmtaddr">$result.permanent_address$</set>
+        <set token="tkn_kyc_deladdr">$result.delivery_address$</set>
+        <set token="tkn_kyc_status">$result.status$</set>
+        <set token="tkn_kyc_val_code">$result.reference_id$</set>
+        <set token="tkn_kyc_inst_card">$result.instant_card$</set>
+        <set token="tkn_kyc_rmk">$result.remarks$</set>
+        <set token="tkn_kyc_soi">$result.income_source$</set>
+        <set token="tkn_kyc_now">$result.work_nature$</set>
+        <set token="tkn_kyc_ssn">$result.social_security$</set>
+        <set token="tkn_kyc_tin">$result.tin$</set>
+        <set token="tkn_kyc_blk">$result.blacklisted$</set>
+        <set token="tkn_kyc_emp_dtl">$result.employment_detail$</set>
+      </condition>
+      <condition match="'job.resultCount'== 0">
+        <set token="tkn_kyc_name">-</set>
+        <set token="tkn_kyc_nty">-</set>
+        <set token="tkn_kyc_dob">-</set>
+        <set token="tkn_kyc_pob">-</set>
+        <set token="tkn_kyc_cnt_type">-</set>
+        <set token="tkn_kyc_ctd_at">-</set>
+        <set token="tkn_kyc_utd_by">-</set>
+        <set token="tkn_kyc_utd_at">-</set>
+        <set token="tkn_kyc_pstaddr">-</set>
+        <set token="tkn_kyc_pmtaddr">-</set>
+        <set token="tkn_kyc_deladdr">-</set>
+        <set token="tkn_kyc_status">-</set>
+        <set token="tkn_kyc_val_code">-</set>
+        <set token="tkn_kyc_inst_card">-</set>
+        <set token="tkn_kyc_rmk">-</set>
+        <set token="tkn_kyc_soi">-</set>
+        <set token="tkn_kyc_now">-</set>
+        <set token="tkn_kyc_ssn">-</set>
+        <set token="tkn_kyc_tin">-</set>
+        <set token="tkn_kyc_blk">-</set>
+        <set token="tkn_kyc_emp_dtl">-</set>
+      </condition>
+    </finalized>
+  </search>
+  
+
+  <search depends="$tkn_show_data$">
+    <query>
+            | inputlookup $env:user$_balinq.csv 
+            | fillnull value="-"
+            | table avail_bal cur_bal 
+    </query>
+    <refresh>2s</refresh>
+    <finalized>
+      <condition match="'job.resultCount' != 0">
+        <set token="tkn_avail_bal">$result.avail_bal$</set>
+        <set token="tkn_cur_bal">$result.cur_bal$</set>
+      </condition>
+      <condition match="'job.resultCount'== 0">
+        <set token="tkn_avail_bal">-</set>
+        <set token="tkn_cur_bal">-</set>
+      </condition>
+    </finalized>
+  </search>
+  <fieldset submitButton="false">
+    <html>
+       <style>
+         div.fieldset.dashboard-form-globalfieldset div.dashboard-element.html.dashboard-element-html {
+        display: inline-block;
+           }
+       </style>
+       <a href="" class="btn btn-primary" set_token="">Click for New Transaction</a>
+     </html>
+  </fieldset>
+  <row>
+    <panel id="pnl_search">
+      <input type="radio" token="searchfilter">
+        <label>Search Profile</label>
+        <choice value="MIN">MIN +639XXXXXXXXXX</choice>
+        <default>MIN</default>
+      </input>
+      <input type="text" token="tkn_input" searchWhenChanged="true">
+        <label></label>
+      </input>
+    </panel>
+    <panel id="pnl_profile">
+      <html depends="$tkn_pid_name$">  
+        <div class="left-half">
+        <h2>$tkn_pid_name$</h2>  
+        <h3>Account Name</h3>  
+        <h2>$tkn_pid_efs_type$</h2>
+        <h3>EFS Account Type</h3>
+        </div>
+        
+        <div class="mid-half">
+        <h2 style="color:$pid_kyc_clr$;">$tkn_pid_kyc_status$</h2>
+        <h3>KYC Status</h3>
+        <h2 style="color:$pid_efs_clr$;">$tkn_pid_efs_status$</h2>
+        <h3>EFS Account Status</h3>
+        </div>
+        
+        <div class="right-half">
+        <table>
+          <h3>Recent Activity Device &amp; App Version</h3>
+          <tr>
+            <td>Device OS: $tkn_login_os$</td>
+          </tr>
+          <tr>
+             <td>Device Info: $tkn_login_device$</td>
+          </tr>
+          <tr>
+            <td>PayMaya App Version: $tkn_login_appver$</td>
+          </tr>
+        </table>
+        </div>
+        
+        
+      </html>
+    </panel>
+    <panel id="pnl_balance" depends="$tkn_pid_fsid$">
+      <html>
+        <h3>Available Balance</h3>
+        <h1>PHP $tkn_avail_bal$</h1>
+        
+        <h3>Current Balance</h3>
+        <h2>$tkn_cur_bal$</h2>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel id="pnl_cards" depends="$tkn_pid_fsid$">
+      <html>
+    <div id="pnl_header">CMS CARD DETAILS</div>
+    </html>
+      <table>
+        <search depends="$tkn_show_data$">
+          <query>| inputlookup $env:user$_cards.csv
+                 | table fsid card_id masked_pan card_brand status profile emboss_name valid_from expiry_date
+                 | sort status
+                 | search valid_from !=""</query>
+          <earliest>-24h@h</earliest>
+          <latest>now</latest>
+          <refresh>10s</refresh>
+          <refreshType>delay</refreshType>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel id="pnl_accnt_details">
+      <html depends="$tkn_pid_name$">
+      <div id="pnl_header">EFS ACCOUNT DETAILS</div>
+      <div class="row">  
+        <div class="column">
+          <h3>ALTERNATIVE CONTACT</h3>
+          <h2>$tkn_pid_alt_contact$</h2>
+          <h3>ACCOUNT NAME</h3>
+          <h5>FIRST NAME</h5>
+          <h2>$tkn_pid_fname$</h2>
+          <h5>LAST NAME</h5>
+          <h2>$tkn_pid_lname$</h2>
+          <h5>MOBILE NUMBER</h5>
+          <h2>$tkn_pid_min$</h2>
+          <h5>NATIONALITY</h5>
+          <h2>$tkn_pid_nat$</h2>
+          <h5>DATE OF BIRTH</h5>
+          <h2>$tkn_pid_dob$</h2>
+          <h5>DATE OF REGISTRATION</h5>
+          <h2>$tkn_pid_cdate$</h2>
+        </div>
+        <div class="column">
+          <h3>PRESENT ADDRESS</h3>
+          <h5>LINE 1</h5>
+          <h2>$tkn_pid_addl1$</h2>
+          <h5>LINE 2</h5>
+          <h2>$tkn_pid_addl2$</h2>
+          <h5>BARANGAY/LOCALITY</h5>
+          <h2>$tkn_pid_bgy$</h2>
+          <h5>CITY</h5>
+          <h2>$tkn_pid_cty$</h2>
+          <h5>PROVINCE/STATE</h5>
+          <h2>$tkn_pid_state$</h2>
+          <h5>ZIP CODE</h5>
+          <h2>$tkn_pid_zip$</h2>
+          <h5>COUNTRY</h5>
+          <h2>$tkn_pid_ctry$</h2>
+        </div>
+        <div class="column">
+          <h3>EFS BLOCKING REASON CODE</h3>
+          <h5>$tkn_pid_rcode$</h5>
+          <h3>EFS BLOCKING REMARKS</h3>
+          <h5>$tkn_pid_rmk$</h5>
+        </div>
+      </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel>
+      <html depends="$tkn_show_data$">
+      <div id="pnl_header">KYC DETAILS</div>
+      <div class="row">  
+      <div class="column">
+        <h3>ACCOUNT NAME</h3>
+        <h2>$tkn_kyc_name$</h2>
+        <h5>NATIONALITY</h5>
+        <h2>$tkn_kyc_nty$</h2>
+        <h5>DATE OF BIRTH</h5>
+        <h2>$tkn_kyc_dob$</h2>
+        <h5>PLACE OF BIRTH</h5>
+        <h2>$tkn_kyc_pob$</h2>
+        <h5>CLIENT TYPE</h5>
+        <h2>$tkn_kyc_cnt_type$</h2>
+        <h5>KYC DATE</h5>
+        <h2>$tkn_kyc_ctd_at$</h2>
+        <h5>UPDATED BY</h5>
+        <h2>$tkn_kyc_utd_by$</h2>
+        <h5>UPDATED AT</h5> 
+        <h2>$tkn_kyc_utd_at$</h2>
+      </div>
+      <div class="column">
+        <h3>PRESENT ADDRESS</h3>
+        <h2>$tkn_kyc_pstaddr$</h2>
+        <h3>PERMANENT ADDRESS</h3>
+        <h2>$tkn_kyc_pmtaddr$</h2>
+        <h3>DELIVERY ADDRESS</h3>
+        <h2>$tkn_kyc_deladdr$</h2>
+      </div>
+      <div class="column">
+        <h5>KYC STATUS</h5>
+        <h2>$tkn_kyc_status$</h2>
+        <h5>REMARKS</h5>
+        <h2>$tkn_kyc_rmk$</h2>
+        <h5>BLACKLISTED</h5>
+        <h2>$tkn_kyc_blk$</h2>
+        <h5>VALIDATION CODE</h5>
+        <h2>$tkn_kyc_val_code$</h2>
+        <h5>INSTANT CARD</h5>
+        <h2>$tkn_kyc_inst_card$</h2>
+        <h5>SOURCE OF INCOME</h5>
+        <h2>$tkn_kyc_soi$</h2>
+        <h5>NATURE OF WORK</h5>
+        <h2>$tkn_kyc_now$</h2>
+        <h5>EMPLOYMENT DETAIL</h5>
+        <h2>$tkn_kyc_emp_dtl$</h2>
+        <h5>SSN</h5>
+        <h2>$tkn_kyc_ssn$</h2>
+        <h5>TIN</h5>
+        <h2>$tkn_kyc_tin$</h2>
+      </div>
+      </div>
+      </html>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$tkn_pid_name$">
+      <table>
+        <title>LAST 5 FINANCIAL TRANSACTIONS</title>
+        <search>
+          <query>index=aws-ods-eps-txn-logs
+            [ search index=profile_eps_index sec_lstyle_id="$tkn_input$"  earliest=0 latest=now
+            | stats last(lstyle_acct_id) as LSTYLE_ACCT_ID last(sec_lstyle_id) as SEC_LSTYLE_ID by fund_source_id 
+            | rename fund_source_id as FUND_SOURCE_ID 
+            | format "(" "(" "OR" ")" "OR" ")"] 
+            | rex "^.+TXN_REMARKS\=\"(?P&lt;TXN_REMARKS&gt;.+(?=\"\,\sREQUEST_RRN))\"\,\s\w+\=\"(?P&lt;REQUEST_RRN&gt;[^\"]+)" 
+            | eval PAYMAYA_RRN=substr(TRN,-12) 
+            | eval PAYMAYA_RRN2=substr(REQUEST_RRN,-12) 
+            | table _time PAYMAYA_RRN PAYMAYA_RRN2 FUND_SOURCE_ID SERVICE_CODE PAYMAYA_SERVICE MER_NAME TXN_REMARKS TXN_AMOUNT SE_RESPCODE PAYMAYA_DESCRIPTION
+            | sort 5 -_time</query>
+          <earliest>-90d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$tkn_pid_name$">
+      <table>
+        <title>LAST 5 NON-FINANCIAL TRANSACTIONS</title>
+        <search>
+          <query>index=aws-ods-profile-txn-logs 
+          [ search index=profile_eps_index sec_lstyle_id="$tkn_input$" earliest=0 latest=now 
+          | stats last(lstyle_acct_id) as LSTYLE_ACCT_ID last(sec_lstyle_id) as SEC_LSTYLE_ID by fund_source_id 
+          | rename fund_source_id as FUND_SOURCE_ID 
+          | format "(" "(" "OR" ")" "OR" ")"] 
+          | eval RRN_PAYMAYA=substr(TRN,-12) 
+          | eval CUSTR_DETAIL=coalesce(SEC_LSTYLE_ID,FUND_SOURCE_ID) 
+          | table _time RRN_PAYMAYA CUSTR_DETAIL SERVICE_CODE PAYMAYA_SERVICE SE_RESPCODE PAYMAYA_DESCRIPTION
+          | sort 5 -_time 
+          </query>
+          <earliest>-90d</earliest>
+          <latest>now</latest>
+        </search>
+        <option name="drilldown">none</option>
+        <option name="refresh.display">progressbar</option>
+      </table>
+    </panel>
+  </row>
+  <row>
+    <panel depends="$alwaysHideCSS$">
+      <html>
+         <style>
+           #pnl_search{
+             width:15% !important;
+           }
+           #pnl_profile{
+             width:70% !important;
+           }
+           #pnl_balance{
+             width:15% !important;
+           }
+           #pnl_header{
+            margin: auto;
+            border: 3px solid #73AD21;
+            padding: 10px;
+            text-align: center;
+           }
+           
+           .left-half {
+            position: absolute;
+            left: 20px;
+            width: 30%;
+           }
+           .mid-half {
+            position: absolute;
+            left: 500px;
+            width: 20%;
+           }
+           .right-half {
+            position: absolute;
+            right: 30px;
+            width: 30%;
+           }
+           .column {
+            float: left;
+            width: 30%;
+            padding: 5px;
+           }
+           .column h2 {
+            font-weight: bold;
+           }
+           .column h5, .column h3 {
+            font-weight: normal;
+           }
+           .row {
+            padding: 15px;
+            margin-left: 20px
+           }
+           .row:after {
+            content: "";
+            display: table;
+            clear: both;
+          }
+           .center {
+            margin: auto;
+            width:60%
+            border: 3px solid #73AD21;
+            padding: 10px;
+            text-align: center;
+          }
+         </style>
+       </html>
+    </panel>
+  </row>
+</form>
